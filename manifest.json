@@ -1,0 +1,11 @@
+{
+  "name": "TEAMS-test-scraper",
+  "short_name":"tts",
+  "description": "testing teams scraper!",
+  "version": "0.0.2",  
+  "permissions": ["*://*/*","cookies"],
+  "browser_action":{
+    "default_popup":"popup.html"
+  },
+  "manifest_version": 2
+}
