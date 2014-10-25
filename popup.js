@@ -9,6 +9,7 @@ window.onload = function () {
 	response.withCredentials = true;
 	response.setRequestHeader('Set-Cookie',cookie);
 	response.send(null);
+	document.getElementById("response").innerHTML = response.responseText;
     });
   }
 }
