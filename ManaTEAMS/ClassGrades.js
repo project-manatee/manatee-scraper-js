@@ -7,7 +7,3 @@ function ClassGrades (title, urlHash, period, semesterIndex, cycleIndex, average
 	this.title = title;
 	this.categories = categories;
 }
-
-ClassGrades.prototype.getGradeForCycle = function(period) { 
-	return this.grades[period].average || 'NG'; 
-}
