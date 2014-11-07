@@ -17,4 +17,9 @@ window.onload = function () {
       });
     });
   }
+  document.getElementById('button2').onclick = function () {
+    ManaTEAMS.isLoggedIn(function(html, isLoggedIn) {
+      document.getElementById("response").innerHTML = isLoggedIn;
+    })
+  }
 }

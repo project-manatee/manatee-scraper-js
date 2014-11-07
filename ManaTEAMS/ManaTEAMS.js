@@ -53,6 +53,14 @@ ManaTEAMS.prototype.getGradesPage = function (teams_req, callback) {
   callback(response.responseText);
 }
 
+ManaTEAMS.isLoggedIn = function (callback) { 
+  var response = new XMLHttpRequest();
+  response.open('GET','https://my-teams.austinisd.org/selfserve/PSSViewReportCardsAction.do',false);
+  response.withCredentials = true;
+  response.send(null);
+  callback(response.responseText, response.responseText.indexOf('Forbidden') === -1);
+}
+
 ManaTEAMS.prototype.getAllCourses = function(teams_req, callback) {
   this.getGradesPage(teams_req, function(html) {
     var parser = new TEAMSParser(html);
