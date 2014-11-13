@@ -2,6 +2,7 @@
 
 function ManaTEAMS(username) {
     this.username = username;
+    this.isParent = username.search(/^[Ss]\d{7}\d?$/) === -1;
 }
 
 ManaTEAMS.prototype.login = function(username, password, callback) {
@@ -18,7 +19,7 @@ ManaTEAMS.prototype.login = function(username, password, callback) {
         name: 'CStoneSessionID'
     }, function(mycookie) {
         var teams_cookie_req = new XMLHttpRequest();
-        teams_cookie_req.open('POST', 'https://my-teams.austinisd.org/selfserve/EntryPointSignOnAction.do?parent=false', false);
+        teams_cookie_req.open('POST', 'https://my-teams.austinisd.org/selfserve/EntryPointSignOnAction.do?parent=' + this.isParent, false);
         teams_cookie_req.withCredentials = true;
         teams_cookie_req.setRequestHeader('Accept', '*/*');
         teams_cookie_req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
@@ -48,7 +49,7 @@ ManaTEAMS.prototype.login = function(username, password, callback) {
                             teams_req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
                             teams_req.withCredentials = true;
                             teams_req.send("userLoginId=" + username + "&userPassword=" + password);
-                            callback(teams_req);
+                            callback();
                         }
                     });
                 });
@@ -58,7 +59,7 @@ ManaTEAMS.prototype.login = function(username, password, callback) {
 }
 
 //must be logged in for following functions
-ManaTEAMS.prototype.getGradesPage = function(teams_req, callback) {
+ManaTEAMS.prototype.getGradesPage = function(callback) {
     var response = new XMLHttpRequest();
     response.open('GET', 'https://my-teams.austinisd.org/selfserve/PSSViewReportCardsAction.do', false);
     response.withCredentials = true;

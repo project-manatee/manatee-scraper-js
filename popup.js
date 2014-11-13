@@ -5,8 +5,8 @@ window.onload = function() {
         var username = document.getElementById('username').value;
         var password = document.getElementById('password').value;
         var manaTEAMS = new ManaTEAMS(username);
-        manaTEAMS.login(username, password, function(teams_req) {
-            manaTEAMS.getGradesPage(teams_req, function(html) {
+        manaTEAMS.login(username, password, function() {
+            manaTEAMS.getGradesPage(function(html) {
                 var parser = new TEAMSParser(html);
                 courses = parser.parseAverages(function(newcourses) {
                     courses = newcourses;
