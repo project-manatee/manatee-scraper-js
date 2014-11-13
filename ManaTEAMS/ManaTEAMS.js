@@ -78,7 +78,7 @@ ManaTEAMS.isLoggedIn = function(callback) {
 ManaTEAMS.prototype.getAllCourses = function(teams_req, callback) {
     this.getGradesPage(teams_req, function(html) {
         var parser = new TEAMSParser(html);
-        return parser.parseAverages();
+        callback(parser.parseAverages());
     });
 }
 
