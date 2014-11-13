@@ -58,30 +58,27 @@ ManaTEAMS.prototype.login = function(username, password, callback) {
     });
 }
 
-//must be logged in for following functions
-ManaTEAMS.prototype.getGradesPage = function(callback) {
+ManaTEAMS.getGradesPage = function(callback) {
     var response = new XMLHttpRequest();
     response.open('GET', 'https://my-teams.austinisd.org/selfserve/PSSViewReportCardsAction.do', false);
     response.withCredentials = true;
     response.send(null);
-    callback(response.responseText);
+    callback(response.responseText, 
+             (response.responseText.indexOf('Forbidden') !== -1) ? "Not logged in" : null );
 }
 
-ManaTEAMS.isLoggedIn = function(callback) {
-    var response = new XMLHttpRequest();
-    response.open('GET', 'https://my-teams.austinisd.org/selfserve/PSSViewReportCardsAction.do', false);
-    response.withCredentials = true;
-    response.send(null);
-    callback(response.responseText, response.responseText.indexOf('Forbidden') === -1);
-}
-
-ManaTEAMS.prototype.getAllCourses = function(teams_req, callback) {
-    this.getGradesPage(teams_req, function(html) {
-        var parser = new TEAMSParser(html);
-        callback(parser.parseAverages());
+ManaTEAMS.prototype.getAllCourses = function(callback) {
+    ManaTEAMS.getGradesPage(function(html, error) {
+        if(!error) {
+	     var parser = new TEAMSParser(html);
+	     parser.parseAverages(function(courses) { 
+                  callback(html, courses);
+	     })
+	}
     });
 }
 
+//must be logged in for following functions
 ManaTEAMS.prototype.getCycleClassGrades = function(courseId, cycle, averagesHtml, cookies) {
     var coursehtmlnode = TEAMSParser.getCourseElement(averagesHtml, courseId, cycle);
 
