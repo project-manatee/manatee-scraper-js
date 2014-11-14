@@ -69,7 +69,7 @@ ManaTEAMS.prototype.login = function(callback) {
                                 student_choice_request.send("selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table");
                                 callback("&selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table");
                             } else {
-                                callback();
+                                callback(null);
                             }
                         }
                     });
