@@ -1,12 +1,21 @@
 'use strict';
 
-function ManaTEAMS(username) {
+function ManaTEAMS(username, password) {
     this.username = username;
+    this.password = password;
     this.isParent = username.search(/^[Ss]\d{7}\d?$/) === -1;
+    if (this.isParent) {
+        this.teamsHost = "https://my-teamsselfserve.austinisd.org";
+    } else {
+        this.teamsHost = "https://my-teams.austinisd.org"
+    }
 }
 
-ManaTEAMS.prototype.login = function(username, password, callback) {
-    var username = username || this.username;
+ManaTEAMS.prototype.login = function(callback) {
+    var username = this.username;
+    var password = this.password;
+    var teamsHost = this.teamsHost;
+    var isParent = this.isParent;
     //this should be a promise
     var myreq = new XMLHttpRequest();
     myreq.open('POST', 'https://my.austinisd.org/WebNetworkAuth/', false);
@@ -19,7 +28,7 @@ ManaTEAMS.prototype.login = function(username, password, callback) {
         name: 'CStoneSessionID'
     }, function(mycookie) {
         var teams_cookie_req = new XMLHttpRequest();
-        teams_cookie_req.open('POST', 'https://my-teams.austinisd.org/selfserve/EntryPointSignOnAction.do?parent=' + this.isParent, false);
+        teams_cookie_req.open('POST', teamsHost + '/selfserve/EntryPointSignOnAction.do?parent=' + isParent, false);
         teams_cookie_req.withCredentials = true;
         teams_cookie_req.setRequestHeader('Accept', '*/*');
         teams_cookie_req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
@@ -34,11 +43,11 @@ ManaTEAMS.prototype.login = function(username, password, callback) {
                 name: 'JSESSIONID'
             }, function(teamscookies) {
                 var teams_req = new XMLHttpRequest();
-                teams_req.open('POST', 'https://my-teams.austinisd.org/selfserve/SignOnLoginAction.do', false);
+                teams_req.open('POST', teamsHost + '/selfserve/SignOnLoginAction.do', false);
                 var i = teamscookies.length;
                 teamscookies.forEach(function(teamscookie) {
                     chrome.cookies.set({
-                        url: 'https://my-teams.austinisd.org',
+                        url: teamsHost,
                         name: 'JSESSIONID',
                         value: teamscookie.value
                     }, function(set_teams_cookie) {
@@ -49,7 +58,19 @@ ManaTEAMS.prototype.login = function(username, password, callback) {
                             teams_req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
                             teams_req.withCredentials = true;
                             teams_req.send("userLoginId=" + username + "&userPassword=" + password);
-                            callback();
+                            if (isParent) {
+                                var studentInfoLocID = TEAMSParser.parseStudentInfoLocID(response);
+                                //TODO Hardcoded user index 0 for now
+                                var student_choice_request = new XMLHttpRequest();
+                                student_choice_request.open('POST', teamsHost + "/selfserve/ViewStudentListChangeTabDisplayAction.do", false);
+                                student_choice_request.setRequestHeader('Accept', '*/*');
+                                student_choice_request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                                student_choice_request.withCredentials = true;
+                                student_choice_request.send("selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table");
+                                callback("&selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table");
+                            } else {
+                                callback();
+                            }
                         }
                     });
                 });
@@ -58,23 +79,22 @@ ManaTEAMS.prototype.login = function(username, password, callback) {
     });
 }
 
-ManaTEAMS.getGradesPage = function(callback) {
+ManaTEAMS.prototype.getGradesPage = function(callback) {
     var response = new XMLHttpRequest();
-    response.open('GET', 'https://my-teams.austinisd.org/selfserve/PSSViewReportCardsAction.do', false);
+    response.open('GET', this.teamsHost + '/selfserve/PSSViewReportCardsAction.do', false);
     response.withCredentials = true;
     response.send(null);
-    callback(response.responseText, 
-             (response.responseText.indexOf('Forbidden') !== -1) ? "Not logged in" : null );
+    callback(response.responseText, (response.responseText.indexOf('Forbidden') !== -1) ? "Not logged in" : null);
 }
 
 ManaTEAMS.prototype.getAllCourses = function(callback) {
-    ManaTEAMS.getGradesPage(function(html, error) {
-        if(!error) {
-	     var parser = new TEAMSParser(html);
-	     parser.parseAverages(function(courses) { 
-                  callback(html, courses);
-	     })
-	}
+    this.getGradesPage(function(html, error) {
+        if (!error) {
+            var parser = new TEAMSParser(html);
+            parser.parseAverages(function(courses) {
+                callback(html, courses);
+            })
+        }
     });
 }
 
@@ -91,7 +111,7 @@ ManaTEAMS.prototype.getCycleClassGrades = function(courseId, cycle, averagesHtml
 
 ManaTEAMS.prototype.getTEAMSPage = function(path, gradeBookKey, userIdentification) {
     var response = new XMLHttpRequest();
-    response.open('POST', 'https://my-teams.austinisd.org' + path, false);
+    response.open('POST', this.teamsHost + path, false);
     response.withCredentials = true;
     response.setRequestHeader('Accept', '*/*');
     response.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')

@@ -13,6 +13,13 @@ TEAMSParser.EXTRA_CREDIT_NOTE_REGEX = function() {
 };
 
 
+TEAMSParser.parseStudentInfoLocID = function(responseHtml) {
+	var dom = $('<html />').html(responseHtml);
+	var studentTable = dom.find('#tableBodyTable');
+	return $(studentTable.find('tr')[0]).attr('locid');
+}
+
+
 TEAMSParser.getCourseElement = function(averagesHtml, courseId, cycle) {
     var dom = $('<html />').html(averagesHtml);
     // Define Grade/Metadata Table
