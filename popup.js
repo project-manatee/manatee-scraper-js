@@ -8,7 +8,7 @@ window.onload = function() {
         manaTEAMS.login(function(selectInfo) {
             manaTEAMS.getAllCourses(function(html, courses) {
                 courseObj = courses; 
-                courseOne = manaTEAMS.getCycleClassGrades(courses[1].courseId, 1, html)
+                courseOne = manaTEAMS.getCycleClassGrades(courses[1].courseId, 1, 0, html)
                 document.getElementById("response").innerHTML = JSON.stringify(courses);
             });
         });
