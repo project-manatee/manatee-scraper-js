@@ -9,9 +9,11 @@ function ManaTEAMS(username, password) {
     } else {
         this.teamsHost = "https://my-teams.austinisd.org"
     }
+    this.isLoggedIn = false;
 }
 
 ManaTEAMS.prototype.login = function(callback) {
+    this.isLoggedIn = true;
     var username = this.username;
     var password = this.password;
     var teamsHost = this.teamsHost;
@@ -99,22 +101,21 @@ ManaTEAMS.prototype.getAllCourses = function(callback) {
 }
 
 //must be logged in for following functions
-ManaTEAMS.prototype.getCycleClassGrades = function(courseId, cycle, semester, averagesHtml, cookies) {
+ManaTEAMS.prototype.getCycleClassGrades = function(courseId, cycle, semester, averagesHtml, callback) {
     var coursehtmlnode = TEAMSParser.getCourseElement(averagesHtml, courseId, cycle);
-
     var gradeBookKey = "selectedIndexId=-1&smartFormName=SmartForm&gradeBookKey=" + encodeURIComponent(coursehtmlnode.find("a")[0].id);
-    var coursehtml = this.getTEAMSPage("/selfserve/PSSViewGradeBookEntriesAction.do", gradeBookKey, cookies);
+    var coursehtml = this.getTEAMSPage("/selfserve/PSSViewGradeBookEntriesAction.do", gradeBookKey);
     //TODO hardcoded number of cycles
     var parser = new TEAMSParser(coursehtml);
-    return parser.parseClassGrades(courseId, semester, cycle);
+    callback(parser.parseClassGrades(courseId, semester, cycle));
 }
 
-ManaTEAMS.prototype.getTEAMSPage = function(path, gradeBookKey, userIdentification) {
+ManaTEAMS.prototype.getTEAMSPage = function(path, gradeBookKey) {
     var response = new XMLHttpRequest();
     response.open('POST', this.teamsHost + path, false);
     response.withCredentials = true;
     response.setRequestHeader('Accept', '*/*');
-    response.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+    response.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     response.send(gradeBookKey);
     return response.responseText;
 }
