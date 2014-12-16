@@ -10,6 +10,7 @@ function ManaTEAMS(username, password) {
         this.teamsHost = "https://my-teams.austinisd.org"
     }
     this.isLoggedIn = false;
+    this.postData = null;
 }
 
 ManaTEAMS.prototype.login = function(callback) {
@@ -18,6 +19,7 @@ ManaTEAMS.prototype.login = function(callback) {
     var password = this.password;
     var teamsHost = this.teamsHost;
     var isParent = this.isParent;
+    var that = this;
     //this should be a promise
     var myreq = new XMLHttpRequest();
     myreq.open('POST', 'https://my.austinisd.org/WebNetworkAuth/', false);
@@ -69,9 +71,10 @@ ManaTEAMS.prototype.login = function(callback) {
                                 student_choice_request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                                 student_choice_request.withCredentials = true;
                                 student_choice_request.send("selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table");
-                                callback("&selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table");
+                                that.postData = "&selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table";
+                                callback();
                             } else {
-                                callback(null);
+                                callback();
                             }
                         }
                     });
@@ -83,9 +86,9 @@ ManaTEAMS.prototype.login = function(callback) {
 
 ManaTEAMS.prototype.getGradesPage = function(callback) {
     var response = new XMLHttpRequest();
-    response.open('GET', this.teamsHost + '/selfserve/PSSViewReportCardsAction.do', false);
+    response.open('POST', this.teamsHost + '/selfserve/PSSViewReportCardsAction.do', false);
     response.withCredentials = true;
-    response.send(null);
+    response.send(this.postData);
     callback(response.responseText, (response.responseText.indexOf('Forbidden') !== -1) ? "Not logged in" : null);
 }
 
@@ -116,6 +119,8 @@ ManaTEAMS.prototype.getTEAMSPage = function(path, gradeBookKey) {
     response.withCredentials = true;
     response.setRequestHeader('Accept', '*/*');
     response.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    response.send(gradeBookKey);
+    var postReq = !!this.postData ? this.postData : '';
+    postReq += !!this.postData ? gradeBookKey.substring(18) /* after 'selectedIndexId' */ : gradeBookKey;
+    response.send(postReq);
     return response.responseText;
 }
