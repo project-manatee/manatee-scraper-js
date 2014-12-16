@@ -63,15 +63,16 @@ ManaTEAMS.prototype.login = function(callback) {
                             teams_req.withCredentials = true;
                             teams_req.send("userLoginId=" + username + "&userPassword=" + password);
                             if (isParent) {
-                                var studentInfoLocID = TEAMSParser.parseStudentInfoLocID(response);
+                                var studentInfoLocID = TEAMSParser.parseStudentInfoLocID(teams_req.responseText);
                                 //TODO Hardcoded user index 0 for now
                                 var student_choice_request = new XMLHttpRequest();
                                 student_choice_request.open('POST', teamsHost + "/selfserve/ViewStudentListChangeTabDisplayAction.do", false);
                                 student_choice_request.setRequestHeader('Accept', '*/*');
                                 student_choice_request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                                 student_choice_request.withCredentials = true;
-                                student_choice_request.send("selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table");
-                                that.postData = "&selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table";
+                                student_choice_request.send("selectedIndexId=-1&studentLocId=" + studentInfoLocID + "&selectedTable=table");
+                                console.log(student_choice_request.responseText);
+                                that.postData = "selectedIndexId=-1&studentLocId=" + studentInfoLocID + "&selectedTable=table";
                                 callback();
                             } else {
                                 callback();

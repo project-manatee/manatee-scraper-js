@@ -5,8 +5,10 @@ window.onload = function() {
         var username = document.getElementById('username').value;
         var password = document.getElementById('password').value;
         var manaTEAMS = new ManaTEAMS(username, password);
-        manaTEAMS.login(function(selectInfo) {
+        manaTEAMS.login(function() {
+            console.log('loggedin');
             manaTEAMS.getAllCourses(function(html, courses) {
+                document.getElementById("response").innerHTML = html;
                 courseObj = courses; 
                 manaTEAMS.getCycleClassGrades(courses[1].courseId, 1, 0, html, function(courseOneret) {
                     courseOne = courseOneret;
