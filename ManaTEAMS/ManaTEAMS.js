@@ -20,68 +20,79 @@ ManaTEAMS.prototype.login = function(callback) {
     var teamsHost = this.teamsHost;
     var isParent = this.isParent;
     var that = this;
-    //this should be a promise
-    var myreq = new XMLHttpRequest();
-    myreq.open('POST', 'https://my.austinisd.org/WebNetworkAuth/', false);
 
-    myreq.setRequestHeader('Accept', '*/*');
+    try {
+        //this should be a promise
+        var myreq = new XMLHttpRequest();
+        myreq.open('POST', 'https://my.austinisd.org/WebNetworkAuth/', false);
 
-    myreq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-    myreq.send('cn=' + username + '&%5Bpassword%5D=' + password);
-    chrome.cookies.getAll({
-        name: 'CStoneSessionID'
-    }, function(mycookie) {
-        var teams_cookie_req = new XMLHttpRequest();
-        teams_cookie_req.open('POST', teamsHost + '/selfserve/EntryPointSignOnAction.do?parent=' + isParent, false);
-        teams_cookie_req.withCredentials = true;
-        teams_cookie_req.setRequestHeader('Accept', '*/*');
-        teams_cookie_req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-        chrome.cookies.set({
-            url: 'https://.austinisd.org',
-            name: 'CStoneSessionID',
-            value: mycookie[0].value
-        }, function(set_cstone_cookie) {
-            teams_cookie_req.send(null);
-            chrome.cookies.getAll({
-                domain: 'my-teams.austinisd.org',
-                name: 'JSESSIONID'
-            }, function(teamscookies) {
-                var teams_req = new XMLHttpRequest();
-                teams_req.open('POST', teamsHost + '/selfserve/SignOnLoginAction.do', false);
-                var i = teamscookies.length;
-                teamscookies.forEach(function(teamscookie) {
-                    chrome.cookies.set({
-                        url: teamsHost,
-                        name: 'JSESSIONID',
-                        value: teamscookie.value
-                    }, function(set_teams_cookie) {
-                        // Crappy fake async foreach
-                        i--;
-                        if (i === 0) {
-                            teams_req.setRequestHeader('Accept', '*/*');
-                            teams_req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-                            teams_req.withCredentials = true;
-                            teams_req.send("userLoginId=" + username + "&userPassword=" + password);
-                            if (isParent) {
-                                var studentInfoLocID = TEAMSParser.parseStudentInfoLocID(response);
-                                //TODO Hardcoded user index 0 for now
-                                var student_choice_request = new XMLHttpRequest();
-                                student_choice_request.open('POST', teamsHost + "/selfserve/ViewStudentListChangeTabDisplayAction.do", false);
-                                student_choice_request.setRequestHeader('Accept', '*/*');
-                                student_choice_request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                                student_choice_request.withCredentials = true;
-                                student_choice_request.send("selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table");
-                                that.postData = "&selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table";
-                                callback();
-                            } else {
-                                callback();
+        myreq.setRequestHeader('Accept', '*/*');
+
+        myreq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+        myreq.send('cn=' + username + '&%5Bpassword%5D=' + password);
+        chrome.cookies.getAll({
+            name: 'CStoneSessionID'
+        }, function(mycookie) {
+            var teams_cookie_req = new XMLHttpRequest();
+            teams_cookie_req.open('POST', teamsHost + '/selfserve/EntryPointSignOnAction.do?parent=' + isParent, false);
+            teams_cookie_req.withCredentials = true;
+            teams_cookie_req.setRequestHeader('Accept', '*/*');
+            teams_cookie_req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+            chrome.cookies.set({
+                url: 'https://.austinisd.org',
+                name: 'CStoneSessionID',
+                value: mycookie[0].value
+            }, function(set_cstone_cookie) {
+                teams_cookie_req.send(null);
+                if (teams_cookie_req.status !== 200) {
+                    callback('no credentials');
+                    return;
+                }
+                chrome.cookies.getAll({
+                    domain: 'my-teams.austinisd.org',
+                    name: 'JSESSIONID'
+                }, function(teamscookies) {
+                    console.log('????????/')
+                    var teams_req = new XMLHttpRequest();
+                    teams_req.open('POST', teamsHost + '/selfserve/SignOnLoginAction.do', false);
+                    var i = teamscookies.length;
+                    teamscookies.forEach(function(teamscookie) {
+                        chrome.cookies.set({
+                            url: teamsHost,
+                            name: 'JSESSIONID',
+                            value: teamscookie.value
+                        }, function(set_teams_cookie) {
+                            // Crappy fake async foreach
+                            i--;
+                            if (i === 0) {
+                                teams_req.setRequestHeader('Accept', '*/*');
+                                teams_req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+                                teams_req.withCredentials = true;
+                                teams_req.send("userLoginId=" + username + "&userPassword=" + password);
+                                if (isParent) {
+                                    console.log('???');
+                                    var studentInfoLocID = TEAMSParser.parseStudentInfoLocID(teams_req.responseText);
+                                    //TODO Hardcoded user index 0 for now
+                                    var student_choice_request = new XMLHttpRequest();
+                                    student_choice_request.open('POST', teamsHost + "/selfserve/ViewStudentListChangeTabDisplayAction.do", false);
+                                    student_choice_request.setRequestHeader('Accept', '*/*');
+                                    student_choice_request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                                    student_choice_request.withCredentials = true;
+                                    student_choice_request.send("selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table");
+                                    that.postData = "selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table";
+                                    callback('success');
+                                } else {
+                                    callback('success');
+                                }
                             }
-                        }
+                        });
                     });
                 });
             });
         });
-    });
+    } catch (error) {
+        callback(error);
+    }
 }
 
 ManaTEAMS.prototype.getGradesPage = function(callback) {
