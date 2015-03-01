@@ -263,7 +263,7 @@ TEAMSParser.prototype.parseSemester = function(cycles, exam, semAvg, index, semP
 
     var examGrade;
     if (semParams.hasExams) {
-        var examText = exam.text();
+        examGrade = exam.text();
     } else {
         examGrade = '';
     }
