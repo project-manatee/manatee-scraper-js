@@ -130,7 +130,6 @@ TEAMSParser.prototype.parseAssignment = function(row, is100Pt, catId) {
     //idk if this avoids exceptions
     var note = (cells.length === 7) ? '' : $(cells[7]).text() || '';
     var ptsEarned = $(cells[1]).text();
-    console.log(ptsEarned);
     var regexp = new RegExp("^(.*?)\\(.*$");
     var match = regexp.exec(ptsEarned);
     if (match != null){
@@ -139,7 +138,6 @@ TEAMSParser.prototype.parseAssignment = function(row, is100Pt, catId) {
     else {
         ptsEarned =  $(cells[1]).text();
     }
-    console.log(ptsEarned);
     var ptsPossNum = isNaN($(cells[4]).text()) ?
         100 :
         $(cells[4]).text();
