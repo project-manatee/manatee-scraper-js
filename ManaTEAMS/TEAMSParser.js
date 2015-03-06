@@ -38,7 +38,7 @@ TEAMSParser.getCourseElement = function(averagesHtml, courseId, cycle) {
     }
     //get the same row in the grades table
     var newCourse = $(gradeRows[rownum]).find("td");
-    return (cycle < 3) ? $(newCourse[cycle]) : $(newCourse[cycle + 2]);
+    return (cycle < 3) ? $(newCourse[cycle]) : $(newCourse[parseInt(cycle) + 2]);
 };
 
 TEAMSParser.prototype.parseClassGrades = function(courseId, semesterIndex, cycleIndex) {
