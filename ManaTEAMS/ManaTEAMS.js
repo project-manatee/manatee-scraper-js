@@ -5,9 +5,9 @@ function ManaTEAMS(username, password) {
     this.password = password;
     this.isParent = username.search(/^[Ss]\d{7}\d?$/) === -1;
     if (this.isParent) {
-        this.teamsHost = "https://my-teamsselfserve.austinisd.org";
+        this.teamsHost = "https://grades.austinisd.org";
     } else {
-        this.teamsHost = "https://my-teams.austinisd.org"
+        this.teamsHost = "https://grades.austinisd.org"
     }
     this.isLoggedIn = false;
 }
