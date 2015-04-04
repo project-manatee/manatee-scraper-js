@@ -116,7 +116,7 @@ ManaTEAMS.prototype.getAllCourses = function(callback) {
 //must be logged in for following functions
 ManaTEAMS.prototype.getCycleClassGrades = function(courseId, cycle, semester, averagesHtml, callback) {
     var coursehtmlnode = TEAMSParser.getCourseElement(averagesHtml, courseId, cycle);
-    var gradeBookKey = "selecedIndexId=-1&smartFormName=SmartForm&gradeBookKey=" + encodeURIComponent(coursehtmlnode.find("a")[0].id);
+    var gradeBookKey = "selectedIndexId=-1&smartFormName=SmartForm&gradeBookKey=" + encodeURIComponent(coursehtmlnode.find("a")[0].id);
     var coursehtml = this.getTEAMSPage("/selfserve/PSSViewGradeBookEntriesAction.do", gradeBookKey);
     //TODO hardcoded number of cycles
     var parser = new TEAMSParser(coursehtml);
