@@ -42,7 +42,7 @@ ManaTEAMS.prototype.login = function(success, error) {
 				if (teams_cookie_req.readyState === 4) {
 					if (teams_cookie_req.status === 200) {
 						chrome.cookies.getAll({
-							domain: 'my-teams.austinisd.org',
+							domain: 'grades.austinisd.org',
 							name: 'JSESSIONID'
 						}, function(teamscookies) {
 							var teams_req = new XMLHttpRequest();

@@ -13,6 +13,8 @@ window.onload = function() {
                 });
                 document.getElementById("response").innerHTML = JSON.stringify(courses);
             });
+        },function(error) {
+            console.log(error);
         });
     }
     document.getElementById('button2').onclick = function() {
