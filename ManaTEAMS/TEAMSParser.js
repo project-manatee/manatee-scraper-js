@@ -114,7 +114,7 @@ TEAMSParser.prototype.parseCategory = function(cat, courseId) {
     var newCat = new Category(catId,
         realCatInfo[0].trim(),
         weightdMatcher[0] || null,
-        averageMatcher[0] || null,
+        averageMatcher == null ? null:averageMatcher[0],
         '', // cat.bonus = GradeCalc.categoryBonuses(assignments);
         // TODO fix this
         parsedAssignments);
@@ -188,7 +188,7 @@ TEAMSParser.prototype.parseAssignment = function(row, is100Pt, catId) {
         title,
         dateAssigned,
         dateDue,
-        grade,
+        ptsEarned,
         ptsPossNum,
         weight,
         note,
