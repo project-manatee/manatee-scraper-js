@@ -13,7 +13,6 @@ function ManaTEAMS(username, password) {
 }
 
 ManaTEAMS.prototype.login = function(success, error) {
-    this.isLoggedIn = true;
     var username = this.username;
     var password = this.password;
     var teamsHost = this.teamsHost;
@@ -62,7 +61,7 @@ ManaTEAMS.prototype.login = function(success, error) {
 										teams_req.withCredentials = true;
 										teams_req.send("userLoginId=" + username + "&userPassword=" + password);
 										if (isParent) {
-											var studentInfoLocID = TEAMSParser.parseStudentInfoLocID(response);
+											var studentInfoLocID = TEAMSParser.parseStudentInfoLocID(teams_req.responseText);
 											//TODO Hardcoded user index 0 for now
 											var student_choice_request = new XMLHttpRequest();
 											student_choice_request.open('POST', teamsHost + "/selfserve/ViewStudentListChangeTabDisplayAction.do", false);
@@ -70,8 +69,10 @@ ManaTEAMS.prototype.login = function(success, error) {
 											student_choice_request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 											student_choice_request.withCredentials = true;
 											student_choice_request.send("selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table");
-											success("&selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table", 'success');
+											this.isLoggedIn = true;
+                                            success("&selectedIndexId=0&studentLocId=" + studentInfoLocID + "&selectedTable=table", 'success');
 										} else {
+                                            this.isLoggedIn = true;
 											success(null, 'success');
 										}
 									}

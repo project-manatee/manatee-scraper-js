@@ -297,7 +297,6 @@ TEAMSParser.prototype.parseSemester = function(cycles, exam, semAvg, index, semP
                     temp = temp + parseInt(parsedCycles[i].average);
                 }
             }
-            console.log(count,temp)
             semester.average = Math.round(temp/count);
         }
     }
