@@ -287,6 +287,19 @@ TEAMSParser.prototype.parseSemester = function(cycles, exam, semAvg, index, semP
         var parsedSemAvg = $(semAvg).text();
         semester.average = parsedSemAvg
         //TODO calculate average
+        if(isNaN(parseInt(parsedSemAvg))){
+            //attempt to calculate manually
+            var temp = 0;
+            var count = 0;
+            for (var i = 0; i < parsedCycles.length; i++){
+                if (!isNaN(parseInt(parsedCycles[i].average))){
+                    count++
+                    temp = temp + parseInt(parsedCycles[i].average);
+                }
+            }
+            console.log(count,temp)
+            semester.average = Math.round(temp/count);
+        }
     }
 
     return semester;
