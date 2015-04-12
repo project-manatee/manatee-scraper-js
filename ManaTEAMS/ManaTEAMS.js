@@ -28,7 +28,7 @@ ManaTEAMS.prototype.login = function(success, error) {
     }, function(mycookie) {
         var teams_cookie_req = new XMLHttpRequest();
         teams_cookie_req.open('POST', teamsHost + '/selfserve/EntryPointSignOnAction.do?parent=' + isParent, true);
-		teams_cookie_req.timeout = 5000; // TODO: tune this
+		teams_cookie_req.timeout = 10000; // TODO: tune this
         teams_cookie_req.withCredentials = true;
         teams_cookie_req.setRequestHeader('Accept', '*/*');
         teams_cookie_req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
