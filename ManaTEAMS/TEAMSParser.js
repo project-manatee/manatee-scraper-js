@@ -138,9 +138,9 @@ TEAMSParser.prototype.parseAssignment = function(row, is100Pt, catId) {
     else {
         ptsEarned =  $(cells[1]).text();
     }
-    var ptsPossNum = isNaN($(cells[4]).text()) ?
+    var ptsPossNum = isNaN($(cells[5]).text()) ?
         100 :
-        $(cells[4]).text();
+        $(cells[5]).text();
 
     // Retrieve both the points earned and the weight of the assignment.
     // Some teachers
